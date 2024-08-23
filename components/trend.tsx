@@ -1,3 +1,8 @@
+import { useFormatCurrency } from "@/hooks/use-formatcurrency";
+import { ArrowDownLeft } from "lucide-react";
+import { ArrowUpRight } from 'lucide-react';
+import { useMemo } from "react";
+
 interface TrendProps {
     type: 'Income' | 'Expense' | 'Investment' | 'Saving';
     amount: number;
@@ -18,23 +23,31 @@ interface TrendProps {
     };
   
     const calcPercentageChange = (amount: number, prevAmount: number): number => {
-      if (prevAmount === 0) return 0;
+      if (!prevAmount || !amount) return 0;
       return ((amount - prevAmount) / prevAmount) * 100;
     };
+
+    const percentageChange = useMemo(
+        () => +calcPercentageChange(amount, prevAmount).toFixed(0),
+        [amount, prevAmount]
+    )
   
-    const formatCurrency = (amount: number): string => {
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "EUR",
-      }).format(amount);
-    };
+    const formattedAmount = useFormatCurrency(amount)
   
     return (
       <>
         <div className={`font-semibold ${colorClasses[type]}`}>{type}</div>
         <div className="font-semibold text-black dark:text-white mb-2">
-          {amount ? formatCurrency(amount) : formatCurrency(0)}
+          {formattedAmount}
         </div>
+          <div className="flex space-x-1 items-center text-sm">
+            {percentageChange <= 0 && <ArrowDownLeft/>}
+            {percentageChange > 0 && <ArrowUpRight/>}
+      <div>
+              
+              {percentageChange}% vs last period
+          </div>
+      </div>
       </>
     );
   }
