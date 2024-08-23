@@ -2,6 +2,7 @@ import Trend from "@/components/trend";
 import PageHeader from "../../components/page-header";
 import TransactionItem from "@/components/transaction-item";
 import TransactionSummaryItem from "@/components/transaction-summary-item";
+import Button from "@/components/button";
 
 export default function Page() {
   return (
@@ -46,7 +47,45 @@ export default function Page() {
           <TransactionItem type="Investment" description="In Microsoft" amount={9000} category=""/>
         </div>
       </div>
-     
+      <div>
+        <h2 className="mb-4 text-lg font-mono">Buttons</h2>
+        <hr className="mb-4 border-gray-200 dark:border-gray-800" />
+        <div className="space-x-4">
+          <Button>Hello</Button>
+          <Button variant="outline">Hello</Button>
+          <Button variant="ghost">Hello</Button>
+
+          <Button size="xs">Hello</Button>
+          <Button size="sm">Hello</Button>
+          <Button size="lg">Hello</Button>
+        </div>
+        <div>
+        <h2 className="mb-4 text-lg font-mono">Forms</h2>
+        <hr className="mb-4 border-gray-200 dark:border-gray-800" />
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-gray-700 dark:text-gray-300 block mb-1">Your name</label>
+            <input type="text" placeholder="Type something in here..." className="w-full rounded-md shadow-sm border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-950" />
+          </div>
+
+          <div>
+            <label className="text-gray-700 dark:text-gray-300 block mb-1">City</label>
+            <select className="w-full rounded-md shadow-sm border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-950">
+              <option>Warsaw</option>
+              <option>Berlin</option>
+              <option>London</option>
+            </select>
+          </div>
+
+          <div className="flex items-center">
+            <input type="checkbox" className="rounded border-gray-300 text-gray-700 bg-white dark:bg-gray-950 dark:text-gray-500 shadow-sm" />
+
+            <label className="text-gray-700 dark:text-gray-300 ml-2">City</label>
+          </div>
+        </div>
+      </div>
+      </div>
+      
     </main>
   );
 }
