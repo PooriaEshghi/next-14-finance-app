@@ -1,7 +1,10 @@
+import TransactionList from "./transaction/transaction-list"
 
 function page() {
   return (
-    <>Hello from the dashboard</>
+    <>
+    <TransactionList/>
+    </>
   )
 }
 

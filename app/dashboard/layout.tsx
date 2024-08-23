@@ -9,7 +9,7 @@ function Layout({
     <>
     <PageHeader className="mt-8"/>
     <main>{children}</main>
-    <footer>Footer</footer>
+    <footer className="mt-auto text-center py-8">Footer</footer>
     </>
   )
 }
