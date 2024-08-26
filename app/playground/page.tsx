@@ -8,6 +8,11 @@ import Input from "@/components/input";
 import Select from "@/components/select";
 import Separator from "@/components/separator";
 import Skeleton from "@/components/skeleton";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Playground"
+};
 
 export default function Page() {
   return (
