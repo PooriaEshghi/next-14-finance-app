@@ -1,10 +1,10 @@
-import TransactionItem from "@/components/transaction-item";
-import { table } from "console";
+import Separator from "@/components/separator";
+import TransactionSummaryItem from "@/components/transaction-summary-item";
 
 interface Transaction {
   id: number;
   amount: number;
-  type: 'Income' | 'Expense' | 'Investment' | 'Saving';
+  type: "Income" | "Expense" | "Investment" | "Saving";
   description: string;
   category: string;
   created_at: string;
@@ -17,17 +17,20 @@ interface GroupedTransactions {
   };
 }
 
-const groupAndSumTransactionsByDate = (transactions: Transaction[]): GroupedTransactions => {
+const groupAndSumTransactionsByDate = (
+  transactions: Transaction[]
+): GroupedTransactions => {
   const grouped: GroupedTransactions = {};
 
   transactions.forEach((transaction: Transaction) => {
-    const date = transaction.created_at.split('T')[0];
+    const date = transaction.created_at.split("T")[0];
     if (!grouped[date]) {
       grouped[date] = { transactions: [], amount: 0 };
     }
     grouped[date].transactions.push(transaction);
 
-    const amount = transaction.type === 'Expense' ? -transaction.amount : transaction.amount;
+    const amount =
+      transaction.type === "Expense" ? -transaction.amount : transaction.amount;
     grouped[date].amount += amount;
   });
   return grouped;
@@ -35,12 +38,12 @@ const groupAndSumTransactionsByDate = (transactions: Transaction[]): GroupedTran
 
 export default async function TransactionList() {
   try {
-    const response = await fetch('http://localhost:3100/transactions', {
+    const response = await fetch("http://localhost:3100/transactions", {
       next: { revalidate: 10 },
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch transactions');
+      throw new Error("Failed to fetch transactions");
     }
 
     const transactions: Transaction[] = await response.json();
@@ -54,13 +57,21 @@ export default async function TransactionList() {
             <p className="text-gray-500">Total: {group.amount}</p>
             <div className="space-y-2">
               {group.transactions.map((transaction: Transaction) => (
-                <TransactionItem
+                <>
+                <Separator/>
+                <TransactionSummaryItem
                   key={transaction.id}
-                  type={transaction.type}
-                  category={transaction.category}
-                  description={transaction.description}
+                  date={date}
                   amount={transaction.amount}
-                />
+                  />
+                </>
+                //     <TransactionItem
+                //     key={transaction.id}
+                //     type={transaction.type}
+                //     category={transaction.category}
+                //     description={transaction.description}
+                //     amount={transaction.amount}
+                //   />
               ))}
             </div>
           </div>
