@@ -38,7 +38,7 @@ const groupAndSumTransactionsByDate = (
 
 export default async function TransactionList() {
   try {
-    const response = await fetch("http://localhost:3100/transactions", {
+    const response = await fetch( `${process.env.API_URL}/transactions`, {
       next: { revalidate: 10 },
     });
 
