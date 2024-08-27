@@ -9,6 +9,9 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { transactionSchema } from "@/lib/validation";
+import { useRouter } from "next/navigation";
+import { purgeTransactionListCache } from "@/lib/actions";
+import FormError from "@/components/form-error";
 
 // Transaction Interface
 interface Transaction {
@@ -29,15 +32,14 @@ export default function TransactionForm() {
     mode: "onTouched",
     resolver: zodResolver(transactionSchema),
   });
-
+  const router = useRouter()
   const [isSaving, setSaving] = useState(false);
 
   const onSubmit: SubmitHandler<Transaction> = async (data) => {
-   console.log(data);
-   
-
+  
     const transaction: Transaction = {
       ...data,
+      created_at:`${data.created_at}T00:00:00`
     };
 
     setSaving(true);
@@ -49,6 +51,8 @@ export default function TransactionForm() {
         },
         body: JSON.stringify(transaction),
       });
+      await purgeTransactionListCache()
+      router.push('/dashboard')
     } finally {
       setSaving(false);
     }
@@ -84,19 +88,19 @@ export default function TransactionForm() {
         <div>
           <Label className="mb-1">Date</Label>
           <Input {...register("created_at")} />
-          {errors.created_at && <p className="mt-1 text-red-500">{errors.created_at.message}</p>}
+          <FormError error={errors.created_at} />
         </div>
 
         <div>
           <Label className="mb-1">Amount</Label>
           <Input {...register("amount")} />
-          {errors.amount && <p className="mt-1 text-red-500">{errors.amount.message}</p>}
+          <FormError error={errors.amount} />
         </div>
 
         <div className="col-span-1 md:col-span-2">
           <Label className="mb-1">Description</Label>
           <Input {...register("description")} />
-          {errors.description && <p className="mt-1 text-red-500">{errors.description.message}</p>}
+          <FormError error={errors.description} />
         </div>
       </div>
 

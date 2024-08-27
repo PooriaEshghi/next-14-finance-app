@@ -39,7 +39,10 @@ const groupAndSumTransactionsByDate = (
 export default async function TransactionList() {
   try {
     const response = await fetch( `${process.env.API_URL}/transactions`, {
-      next: { revalidate: 10 },
+      next: {
+         revalidate: 10,
+        tags: ['transaction-list'] 
+      },
     });
 
     if (!response.ok) {
@@ -65,13 +68,7 @@ export default async function TransactionList() {
                   amount={transaction.amount}
                   />
                 </>
-                //     <TransactionItem
-                //     key={transaction.id}
-                //     type={transaction.type}
-                //     category={transaction.category}
-                //     description={transaction.description}
-                //     amount={transaction.amount}
-                //   />
+               
               ))}
             </div>
           </div>
