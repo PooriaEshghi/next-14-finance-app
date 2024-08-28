@@ -29,6 +29,7 @@ export default function TransactionForm() {
     handleSubmit,
     formState: { errors },
   } = useForm<Transaction>({
+    defaultValues:{},
     mode: "onTouched",
     resolver: zodResolver(transactionSchema),
   });

@@ -1,13 +1,19 @@
+import { createClient } from "@/lib/Supabase/server"
+import { sizes, variants } from "@/lib/variants"
+import { PlusCircle } from "lucide-react"
+import Link from "next/link"
 import { Suspense } from "react"
 import TransactionList from "./camponents/transaction-list"
 import TransactionListFallback from "./camponents/transaction-list-fallback"
 import Trend from "./camponents/trend"
 import TrendFallback from "./camponents/trend-fallback"
-import Link from "next/link"
-import { PlusCircle } from "lucide-react"
-import { sizes, variants } from "@/lib/variants"
 
-function page() {
+async function page() {
+  const client = createClient()
+  console.log(
+    await client.from('transactions').select()
+  );
+  
   return (
     <>
      <section className="mb-8">
