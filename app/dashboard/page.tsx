@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/Supabase/server"
+import { createClient } from "@/Supabase/server"
 import { sizes, variants } from "@/lib/variants"
 import { PlusCircle } from "lucide-react"
 import Link from "next/link"

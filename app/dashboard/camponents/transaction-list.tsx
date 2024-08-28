@@ -1,5 +1,6 @@
 import Separator from "@/components/separator";
 import TransactionSummaryItem from "@/components/transaction-summary-item";
+import { createClient } from "@/Supabase/server";
 
 interface Transaction {
   id: number;
@@ -38,18 +39,21 @@ const groupAndSumTransactionsByDate = (
 
 export default async function TransactionList() {
   try {
-    const response = await fetch( `${process.env.API_URL}/transactions`, {
-      next: {
-         revalidate: 10,
-        tags: ['transaction-list'] 
-      },
-    });
+    const supabase = createClient();
+    const { data: transactions, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .order('created_at', { ascending: true });
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch transactions");
+    if (error) {
+      throw new Error(error.message);
     }
 
-    const transactions: Transaction[] = await response.json();
+    // Check if transactions is null
+    if (!transactions) {
+      return <p>No transactions found.</p>;
+    }
+
     const groupedTransactions = groupAndSumTransactionsByDate(transactions);
 
     return (
@@ -61,14 +65,13 @@ export default async function TransactionList() {
             <div className="space-y-2">
               {group.transactions.map((transaction: Transaction) => (
                 <>
-                <Separator/>
-                <TransactionSummaryItem
-                  key={transaction.id}
-                  date={date}
-                  amount={transaction.amount}
+                  <Separator />
+                  <TransactionSummaryItem
+                    key={transaction.id}
+                    date={date}
+                    amount={transaction.amount}
                   />
                 </>
-               
               ))}
             </div>
           </div>
