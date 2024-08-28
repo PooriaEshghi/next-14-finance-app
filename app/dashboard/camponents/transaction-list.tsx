@@ -1,6 +1,6 @@
 import Separator from "@/components/separator";
 import TransactionSummaryItem from "@/components/transaction-summary-item";
-import { createClient } from "@/Supabase/server";
+import { createClient } from "@/lib/Supabase/server";
 
 interface Transaction {
   id: number;

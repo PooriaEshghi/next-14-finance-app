@@ -10,18 +10,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { transactionSchema } from "@/lib/validation";
 import { useRouter } from "next/navigation";
-import { purgeTransactionListCache } from "@/lib/actions";
+import { createTransaction} from "@/lib/actions";
 import FormError from "@/components/form-error";
+import { FieldError } from "react-hook-form";
+import { Transaction } from "@/types/types";
 
-// Transaction Interface
-interface Transaction {
-  id: number;
-  amount: number;
-  type: "Income" | "Expense" | "Investment" | "Saving";
-  description: string;
-  category: string;
-  created_at: string;
-}
+
 
 export default function TransactionForm() {
   const {
@@ -35,6 +29,9 @@ export default function TransactionForm() {
   });
   const router = useRouter()
   const [isSaving, setSaving] = useState(false);
+  const [lastError, setLastError] = useState<string | FieldError | null>();
+
+
 
   const onSubmit: SubmitHandler<Transaction> = async (data) => {
   
@@ -44,17 +41,21 @@ export default function TransactionForm() {
     };
 
     setSaving(true);
+    setLastError(undefined)
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transactions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(transaction),
-      });
-      await purgeTransactionListCache()
+     
+      await createTransaction(data)
       router.push('/dashboard')
-    } finally {
+    }catch (error) {
+      if (typeof error === "object" && error !== null && "message" in error) {
+        setLastError((error as Error).message);
+      } else {
+        setLastError("An unexpected error occurred");
+      }
+    
+    }
+    
+    finally {
       setSaving(false);
     }
   };
@@ -105,7 +106,12 @@ export default function TransactionForm() {
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center">
+      <div>
+  {lastError && <FormError error={lastError} />}
+</div>
+
+
         <Button type="submit" disabled={isSaving}>
           Save
         </Button>
