@@ -21,6 +21,8 @@ export default function TransactionForm() {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<Transaction>({
     defaultValues:{},
@@ -30,6 +32,7 @@ export default function TransactionForm() {
   const router = useRouter()
   const [isSaving, setSaving] = useState(false);
   const [lastError, setLastError] = useState<string | FieldError | null>();
+  const type = watch('type')
 
 
 
@@ -65,7 +68,13 @@ export default function TransactionForm() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label className="mb-1">Type</Label>
-          <Select {...register("type")}>
+          <Select {...register("type",{
+            onChange:(e) => {
+              if(e.target.value === "Expense"){
+                setValue('category','')
+              }
+            }
+          })}>
             {types.map((type) => (
               <option key={type} value={type}>
                 {type}
@@ -78,6 +87,7 @@ export default function TransactionForm() {
         <div>
           <Label className="mb-1">Category</Label>
           <Select {...register("category")}>
+            <option value=''>Select category</option>
             {categories.map((category) => (
               <option key={category} value={category}>
                 {category}

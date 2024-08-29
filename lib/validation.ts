@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { categories, types } from "./consts";
 
-// Define the transaction schema using Zod
 export const transactionSchema = z.object({
   type: z.enum(types),
   category: z.preprocess(
@@ -28,5 +27,5 @@ export const transactionSchema = z.object({
   message: "Category is required for Expense",
 });
 
-// TypeScript inferred type from Zod schema
-export type Transaction = z.infer<typeof transactionSchema>;
+
+// export type Transaction = z.infer<typeof transactionSchema>;
