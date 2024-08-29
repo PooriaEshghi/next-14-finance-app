@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/Supabase/server"
 import { sizes, variants } from "@/lib/variants"
 import { PlusCircle } from "lucide-react"
 import Link from "next/link"
@@ -9,18 +8,29 @@ import Trend from "./camponents/trend"
 import TrendFallback from "./camponents/trend-fallback"
 import { ErrorBoundary } from "react-error-boundary";
 import { types } from "@/lib/consts"
+import Range from "./camponents/range"
 
-async function page() {
-  const client = createClient()
+interface PageProps {
+  searchParams: {
+    range?: string;
+    [key: string]: string | undefined;
+  };
+}
+
+async function page({ searchParams }: PageProps) {
+  const range = searchParams?.range ?? 'last30days'
   return (
     <>
-     <section className="mb-8">
+     <section className="mb-8 flex justify-between items-center" >
       <h1 className="text-4xl font-semibold">Summary</h1>
+      <aside>
+        <Range/>
+      </aside>
     </section>
      <section className="mb-8 grid grid-cols-2 lg:grid-cols-4 gap-8">
      {types.map(type => <ErrorBoundary key={type} fallback={<div className="text-red-500">Cannot fetch {type} trend data</div>}>
         <Suspense fallback={<TrendFallback />}>
-          <Trend type={type} />
+          <Trend type={type} range={range}/>
         </Suspense>
       </ErrorBoundary>)}
     </section>
