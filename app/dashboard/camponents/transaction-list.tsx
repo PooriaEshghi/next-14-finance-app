@@ -1,6 +1,12 @@
+"use client";
+import Button from "@/components/button";
 import Separator from "@/components/separator";
+import TransactionItem from "@/components/transaction-item";
 import TransactionSummaryItem from "@/components/transaction-summary-item";
-import { createClient } from "@/lib/Supabase/server";
+import { fetchTransactions } from "@/lib/actions";
+import { groupAndSumTransactionsByDate } from "@/lib/utils";
+import { Loader } from "lucide-react";
+import { useState } from "react";
 
 interface Transaction {
   id: number;
@@ -11,75 +17,68 @@ interface Transaction {
   created_at: string;
 }
 
-interface GroupedTransactions {
-  [date: string]: {
-    transactions: Transaction[];
-    amount: number;
-  };
+interface TransactionListProps {
+  range: string;
+  initialTransactions: Transaction[];
 }
+export default function TransactionList({
+  range,
+  initialTransactions,
+}: TransactionListProps) {
+  const [transactions, setTransactions] = useState(initialTransactions);
+  const [offset, setOffset] = useState(initialTransactions.length);
+  const [buttonHidden, setButtonHidden] = useState(
+    initialTransactions.length === 0
+  );
+  const [loading, setLoading] = useState(false);
+  const groupedTransactions = groupAndSumTransactionsByDate(transactions);
 
-const groupAndSumTransactionsByDate = (
-  transactions: Transaction[]
-): GroupedTransactions => {
-  const grouped: GroupedTransactions = {};
-
-  transactions.forEach((transaction: Transaction) => {
-    const date = transaction.created_at.split("T")[0];
-    if (!grouped[date]) {
-      grouped[date] = { transactions: [], amount: 0 };
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    setLoading(true);
+    // let nextTransactions = null
+    try {
+      let nextTransactions = await fetchTransactions(range, offset, 10);
+      setButtonHidden(nextTransactions.length === 0);
+      setOffset((prevValue) => prevValue + 10);
+      setTransactions((prevTransactions) => [
+        ...prevTransactions,
+        ...nextTransactions,
+      ]);
+    } finally {
+      setLoading(false);
     }
-    grouped[date].transactions.push(transaction);
+  };
 
-    const amount =
-      transaction.type === "Expense" ? -transaction.amount : transaction.amount;
-    grouped[date].amount += amount;
-  });
-  return grouped;
-};
-
-export default async function TransactionList() {
-  try {
-    const supabase = createClient();
-    const { data: transactions, error } = await supabase
-      .from('transactions')
-      .select('*')
-      .order('created_at', { ascending: true });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    // Check if transactions is null
-    if (!transactions) {
-      return <p>No transactions found.</p>;
-    }
-
-    const groupedTransactions = groupAndSumTransactionsByDate(transactions);
-
-    return (
-      <section className="space-y-4">
-        {Object.entries(groupedTransactions).map(([date, group]) => (
-          <div key={date}>
-            <h2 className="font-bold text-lg">{date}</h2>
-            <p className="text-gray-500">Total: {group.amount}</p>
-            <div className="space-y-2">
-              {group.transactions.map((transaction: Transaction) => (
-                <>
-                  <Separator />
-                  <TransactionSummaryItem
-                    key={transaction.id}
-                    date={date}
-                    amount={transaction.amount}
-                  />
-                </>
-              ))}
+  return (
+    <div className="space-y-8">
+      {Object.entries(groupedTransactions).map(([date, { transactions, amount }]) => (
+        <div key={date}>
+          <TransactionSummaryItem date={date} amount={amount} />
+          <Separator />
+          <section className="space-y-4">
+            {transactions.map((transaction) => (
+              <div key={transaction.id}>
+               <TransactionItem type={transaction.type} description={transaction.description} amount={transaction.amount} category={transaction.category} id={transaction.id}/>
+              </div>
+            ))}
+          </section>
+        </div>
+      ))}
+      {transactions.length === 0 && (
+        <div className="text-center text-gray-400 dark:text-gray-500">
+          No transactions found
+        </div>
+      )}
+      {!buttonHidden && (
+        <div className="flex justify-center">
+          <Button variant="ghost" onClick={handleClick} disabled={loading}>
+            <div className="flex items-center space-x-1">
+              {loading && <Loader className="animate-spin" />}
+              <div>Load More</div>
             </div>
-          </div>
-        ))}
-      </section>
-    );
-  } catch (error) {
-    console.error("Error fetching transactions:", error);
-    return <p>Failed to load transactions. Please try again later.</p>;
-  }
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 }

@@ -1,6 +1,6 @@
 import Trend from "@/components/trend";
 import PageHeader from "../../components/page-header";
-import TransactionItem from "@/components/transaction-item";
+// import TransactionItem from "@/components/transaction-item";
 import TransactionSummaryItem from "@/components/transaction-summary-item";
 import Button from "@/components/button";
 import Label from "@/components/label";
@@ -37,12 +37,12 @@ export default function Page() {
       <div>
         <h2 className="mb-4 text-lg font-mono">TransactionItem</h2>
         <Separator />
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <TransactionItem type="Income" description="Salary" amount={2000} category=""/>
           <TransactionItem type="Expense" category="Food" description="Going out to eat" amount={29} />
           <TransactionItem type="Saving" description="For children" amount={500} category=""/>
           <TransactionItem type="Investment" description="In Microsoft" amount={9000} category=""/>
-        </div>
+        </div> */}
       </div>
       <div>
         <h2 className="mb-4 text-lg font-mono">TransactionSummaryItem + TransactionItem</h2>
@@ -51,10 +51,10 @@ export default function Page() {
           <TransactionSummaryItem amount={3500} date="2024-05-08"/>
         <Separator />
 
-          <TransactionItem type="Income" description="Salary" amount={2000} category=""/>
+          {/* <TransactionItem type="Income" description="Salary" amount={2000} category=""/>
           <TransactionItem type="Expense" category="Food" description="Going out to eat" amount={29} />
           <TransactionItem type="Saving" description="For children" amount={500} category=""/>
-          <TransactionItem type="Investment" description="In Microsoft" amount={9000} category=""/>
+          <TransactionItem type="Investment" description="In Microsoft" amount={9000} category=""/> */}
         </div>
       </div>
       <div>
