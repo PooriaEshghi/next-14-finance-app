@@ -4,7 +4,7 @@ import { JSX, ClassAttributes, ButtonHTMLAttributes } from "react"
 type ButtonProps = JSX.IntrinsicAttributes &
   ClassAttributes<HTMLButtonElement> &
   ButtonHTMLAttributes<HTMLButtonElement> & {
-    variant?: 'default' | 'outline' | 'ghost';
+    variant?: 'default' | 'outline' | 'ghost' | 'danger';
     size?: 'xs' | 'sm' | 'base' | 'lg';
   };
 

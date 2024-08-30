@@ -35,7 +35,6 @@ export default function TransactionList({
 
   const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     setLoading(true);
-    // let nextTransactions = null
     try {
       let nextTransactions = await fetchTransactions(range, offset, 10);
       setButtonHidden(nextTransactions.length === 0);
@@ -48,6 +47,9 @@ export default function TransactionList({
       setLoading(false);
     }
   };
+  const handleRemoved = (id:number) => () => {
+    setTransactions(prev => [...prev].filter(t => t.id !== id))
+  }
 
   return (
     <div className="space-y-8">
@@ -58,7 +60,8 @@ export default function TransactionList({
           <section className="space-y-4">
             {transactions.map((transaction) => (
               <div key={transaction.id}>
-               <TransactionItem type={transaction.type} description={transaction.description} amount={transaction.amount} category={transaction.category} id={transaction.id}/>
+                <TransactionItem {...transaction} onRemoved={handleRemoved(transaction.id)}/>
+               {/* <TransactionItem type={transaction.type} description={transaction.description} amount={transaction.amount} category={transaction.category} id={transaction.id}/> */}
               </div>
             ))}
           </section>
