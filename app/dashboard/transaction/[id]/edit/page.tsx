@@ -1,4 +1,10 @@
+import TransactionForm from "@/app/dashboard/camponents/transaction-form";
 import { createClient } from "@/lib/Supabase/server";
+import { notFound } from 'next/navigation';
+
+export const metadata = {
+  title: "Edit Transaction"
+}
 
 type PageProps = {
   params: {
@@ -20,5 +26,10 @@ export default async function Page({ params: { id } }: PageProps): Promise<JSX.E
   }
 
   console.log(transaction);
-  return <>Hello!</>;
+  if (error) notFound()
+
+    return <>
+      <h1 className="text-4xl font-semibold mb-8">Edit Transaction</h1>
+      <TransactionForm initialData={transaction} />
+    </>
 }

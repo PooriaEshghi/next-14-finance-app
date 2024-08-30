@@ -7,17 +7,24 @@ import Select from "@/components/select";
 import { categories, types } from "@/lib/consts";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { transactionSchema } from "@/lib/validation";
 import { useRouter } from "next/navigation";
-import { createTransaction} from "@/lib/actions";
+import { createTransaction, updateTransaction} from "@/lib/actions";
 import FormError from "@/components/form-error";
 import { FieldError } from "react-hook-form";
 import { Transaction } from "@/types/types";
 
+interface InitialTransactionFormProps {
+  initialData: Transaction;
+}
 
+export default function TransactionForm({initialData}:InitialTransactionFormProps) {
+  const [today, setToday] = useState('');
 
-export default function TransactionForm() {
+useEffect(() => {
+  setToday(new Date().toDateString());
+}, []);
   const {
     register,
     handleSubmit,
@@ -25,14 +32,22 @@ export default function TransactionForm() {
     setValue,
     formState: { errors },
   } = useForm<Transaction>({
-    defaultValues:{},
     mode: "onTouched",
     resolver: zodResolver(transactionSchema),
+    defaultValues: initialData ?? {
+      created_at: today
+    }
+    // defaultValues: {
+    //   ...initialData,
+    //   created_at: initialData?.created_at ?? new Date().toISOString().split('T')[0],
+    // },
   });
   const router = useRouter()
   const [isSaving, setSaving] = useState(false);
   const [lastError, setLastError] = useState<string | FieldError | null>();
   const type = watch('type')
+  // const editing = Boolean(initialData)
+  const editing = !!initialData
 
 
 
@@ -46,8 +61,15 @@ export default function TransactionForm() {
     setSaving(true);
     setLastError(undefined)
     try {
-     
-      await createTransaction(data)
+     if (editing) {
+      await updateTransaction(
+        initialData.id,
+        data
+      )
+     } else {
+      
+       await createTransaction(data)
+     }
       router.push('/dashboard')
     }catch (error) {
       if (typeof error === "object" && error !== null && "message" in error) {
@@ -99,7 +121,7 @@ export default function TransactionForm() {
 
         <div>
           <Label className="mb-1">Date</Label>
-          <Input {...register("created_at")} />
+          <Input {...register("created_at")} disabled={editing} />
           <FormError error={errors.created_at} />
         </div>
 
@@ -129,3 +151,5 @@ export default function TransactionForm() {
     </form>
   );
 }
+
+
