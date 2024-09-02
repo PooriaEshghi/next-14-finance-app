@@ -1,8 +1,9 @@
 "use server";
 import { createClient } from "./Supabase/server";
 import { revalidatePath } from "next/cache";
-import { Transaction } from "../types/types";
+import { Transaction, User } from "../types/types";
 import { transactionSchema } from "./validation";
+
 
 export async function createTransaction(formData: Transaction) {
   const validated = transactionSchema.safeParse(formData);
@@ -30,27 +31,56 @@ export async function fetchTransactions(range: string, offset = 0, limit = 10) {
   return data;
 }
 
-export async function deleteTransaction(id:number){
-  const supabase = createClient()
-  const { error } = await supabase.from('transactions')
-    .delete()
-    .eq('id', id)
-  if (error) throw new Error(`Could not delete the transaction ${id}`)
-  revalidatePath('/dashboard')
+export async function deleteTransaction(id: number) {
+  const supabase = createClient();
+  const { error } = await supabase.from("transactions").delete().eq("id", id);
+  if (error) throw new Error(`Could not delete the transaction ${id}`);
+  revalidatePath("/dashboard");
 }
-export async function updateTransaction(id:number, formData:Transaction) {
-  const validated = transactionSchema.safeParse(formData)
+export async function updateTransaction(id: number, formData: Transaction) {
+  const validated = transactionSchema.safeParse(formData);
   if (!validated.success) {
-    throw new Error('Invalid data')
+    throw new Error("Invalid data");
   }
 
-  const { error } = await createClient().from('transactions')
+  const { error } = await createClient()
+    .from("transactions")
     .update(formData)
-    .eq('id', id)
+    .eq("id", id);
 
   if (error) {
-    throw new Error('Failed creating the transaction')
+    throw new Error("Failed creating the transaction");
   }
 
-  revalidatePath('/dashboard')
+  revalidatePath("/dashboard");
 }
+export async function login(prevState: any, formData: FormData) {
+  const supabase = createClient();
+  const email = formData.get("email");
+
+  if (!email || typeof email !== 'string') {
+    return {
+      error: true,
+      message: "Invalid email address!",
+    };
+  }
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      shouldCreateUser: true,
+    },
+  });
+
+  if (error) {
+    return {
+      error: true,
+      message: "Error authenticating!",
+    };
+  }
+
+  return {
+    message: `Email sent to ${email}`,
+  };
+}
+

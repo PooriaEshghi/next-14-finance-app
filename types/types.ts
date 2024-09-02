@@ -6,3 +6,8 @@ export interface Transaction {
     category: string;
     created_at: string;
   }
+
+  export type User = {
+    email: string;
+    // password: string; 
+  };
